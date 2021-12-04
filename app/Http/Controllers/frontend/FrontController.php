@@ -1701,20 +1701,20 @@ class FrontController extends Controller
             try{
                 $id = $request->id;
                 $in_id = $id*10;
-                if($request->part4 == 'shop'){
+                if($request->part3 == 'shop'){
                     $results = DB::table('products')->skip($in_id)->take(10)->get();
                 }
-                if($request->part4 == 'shop-by-cat'){
-                    $results = DB::table('products')->where('cat_id', $request->part5)->skip($in_id)->take(10)->get();
+                if($request->part3 == 'shop-by-cat'){
+                    $results = DB::table('products')->where('cat_id', $request->part4)->skip($in_id)->take(10)->get();
                 }
-                if($request->part4 == 'shop-by-subCat'){
+                if($request->part3 == 'shop-by-subCat'){
                     $sub_cat = DB::table('subcategories')
-                        ->where('id', $request->part5)
+                        ->where('id', $request->part4)
                         ->where('status', 1)
                         ->orderBy('id', 'Desc')->first();
                     $results = DB::table('products')
                         ->where('cat_id', $sub_cat->cat_id)
-                        ->where('sub_cat_id', $request->part5)
+                        ->where('sub_cat_id', $request->part4)
                         ->where('status', 1)
                         ->skip($in_id)->take(10)->get();
                 }

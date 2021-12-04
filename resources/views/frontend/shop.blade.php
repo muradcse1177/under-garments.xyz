@@ -246,8 +246,8 @@
                     data: {
                         "_token": "{{ csrf_token() }}",
                         "id":loadCounter,
+                        "part3":parts[3],
                         "part4":parts[4],
-                        "part5":parts[5],
                     },
                     dataType: 'json',
                     success: function(response){
