@@ -294,7 +294,7 @@
                                                             <li>
                                                                 <ul>
                                                                     @foreach($sub_categories as $s_cat)
-                                                                        <li><a href="{{url('shop-by-sub-cat?cat_id='.$cat->id.'&sub_cat_id='.$s_cat->id)}}">{{$s_cat->name}}</a></li>
+                                                                        <li><a href="{{url('shop-by-subCat/'.$s_cat->id)}}">{{$s_cat->name}}</a></li>
                                                                     @endforeach
                                                                 </ul>
                                                             </li>
@@ -449,7 +449,7 @@
             </div>
             <div class="footer-bottom">
                 <div class="footer-left">
-                    <p class="copyright">Copyright © {{Date('Y')}} Bazar-Sadai Store. All Rights Reserved. Design And Developed by <a href="https://parallax-soft.com/" style="color: darkgreen;" target="_blank"><b>Parallax Soft Inc.</b> </a></p>
+                    <p class="copyright">Copyright © {{Date('Y')}} Under-Garments.Xyz. All Rights Reserved. Design And Developed by <a href="https://parallax-soft.com/" style="color: darkgreen;" target="_blank"><b>Parallax Soft Inc.</b> </a></p>
                 </div>
                 <div class="footer-right">
                     <span class="payment-label mr-lg-8">We're using safe payment for</span>
@@ -596,7 +596,7 @@
                             ?>
                             <ul>
                                 @foreach($sub_categories as $s_cat)
-                                    <li><a href="{{url('shop-by-sub-cat?cat_id='.$cat->id.'&sub_cat_id='.$s_cat->id)}}">{{$s_cat->name}}</a></li>
+                                    <li><a href="{{url('shop-by-subCat/'.$s_cat->id)}}">{{$s_cat->name}}</a></li>
                                 @endforeach
                             </ul>
                             <?php
@@ -654,6 +654,12 @@
             $('#'+id+'productForm').submit(function(e){
                 e.preventDefault();
                 var quantity = $("#"+id+"q").val();
+                if($(".selectChecker").val() == 1){
+                    var size = $(".size").val();
+                }
+                else{
+                    var size = 0;
+                }
                 $.ajax({
                     type: 'POST',
                     url:  '{{ url('product/cart_add') }}',
@@ -661,6 +667,7 @@
                         "_token": "{{ csrf_token() }}",
                         "id": id,
                         "quantity": quantity,
+                        "size": size,
                     },
                     dataType: 'json',
                     success: function(response){

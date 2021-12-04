@@ -125,21 +125,25 @@
             </div>
         </div>
         <div class="container">
+
             <?php
                 foreach ($pro_categories as $category){
             ?>
-            <div class="product-wrapper-1 appear-animate mb-5">
-                <div class="title-link-wrapper pb-1 mb-4" style="background-color: #00BAA3;">
-                    <h2 class="title ls-normal mb-0 catHeader">{{$category->name}}</h2>
-                    <a href="{{url('shop-by-cat/'.$category->id)}}" class="font-size-normal font-weight-bold ls-25 mb-0 catHeaderSee">See More<i class="w-icon-long-arrow-right"></i></a>
-                </div>
-                <?php
-                    $products= DB::table('products')
+                <div class="product-wrapper-1 appear-animate mb-5">
+                    <div class="title-link-wrapper pb-1 mb-4" style="background-color: #00BAA3;">
+                        <h2 class="title ls-normal mb-0 catHeader">{{$category->name}}</h2>
+                        <a href="{{url('shop-by-cat/'.$category->id)}}" class="font-size-normal font-weight-bold ls-25 mb-0 catHeaderSee">See More<i class="w-icon-long-arrow-right"></i></a>
+                    </div>
+                    <?php
+                    $product= DB::table('products')
                         ->where('cat_id', $category->id)
                         ->where('status', 1)
-                        ->inRandomOrder()->take(15)->get();
-                ?>
-                <div class="owl-carousel owl-theme product-wrapper row cols-md-5 cols-sm-2 cols-2" data-owl-options="{
+                        ->inRandomOrder()->take(10)->get();
+                    $k =0;
+                    ?>
+                    <div class="row">
+                        <div class="col-lg-12 col-sm-12">
+                            <div class="owl-carousel owl-theme row cols-xl-4 cols-lg-3 cols-2" data-owl-options="{
                                 'nav': false,
                                 'dots': true,
                                 'margin': 20,
@@ -151,57 +155,76 @@
                                         'items': 2
                                     },
                                     '992': {
-                                        'items': 3
+                                        'items': 4
                                     },
                                     '1200': {
                                         'items': 5
                                     }
                                 }
                             }">
-                    @foreach($products as $product)
-                        <div class="product-wrap">
-                            <div class="product product-simple text-center">
-                                <form class="form-inline" id="{{$product->id.'productForm'}}">
-                                    <figure class="product-media">
-                                        <a href="{{url('product-by-id/'.$product->id)}}">
-                                            <img src="{{$product->photo}}" alt="Product"
-                                                 width="330" height="338" />
-                                        </a>
-                                        <div class="product-action-vertical">
-                                            <a href="#" class="btn-product-icon btn-wishlist w-icon-heart wishlistProduct"
-                                               title="Add to wishlist" data-id="{{$product->id}}" id="{{'wish'.$product->id}}"></a>
-                                            <a href="#" class="btn-product-icon btn-compare w-icon-compare compareProduct"
-                                               title="Add to Compare" data-id="{{$product->id}}" id="{{'com'.$product->id}}"></a>
-                                        </div>
-                                        <div class="product-action">
-                                            <a href="{{url('product-by-id/'.$product->id)}}" class="btn-product btn-quickview" title="Quick View">Quick
-                                                View</a>
-                                        </div>
-                                    </figure>
-                                    <div class="product-details">
-                                        <h4 class="product-name">
-                                            <a href="">{{$product->unit}}</a>
-                                        </h4>
-                                        <h3 class="product-name">
-                                            <a href="{{url('product-by-id/'.$product->id)}}">{{$product->name}}</a>
-                                        </h3>
-                                        <div class="product-pa-wrapper">
-                                            <input type="hidden" name="quantity" id="{{$product->id.'q'}}" value="{{$product->minqty}}">
-                                            <div class="product-price">
-                                                <ins class="new-price">{{$product->discount_price.' Taka'}}</ins><del class="old-price">{{$product->price.' Taka'}}</del>
+                                @for($i=0; $i<5;$i++)
+                                    <div class="product-col">
+                                        @for($j=0; $j<2;$j++)
+                                            <div class="product product-simple text-center">
+                                                <form class="form-inline" id="{{$product[$k]->id.'productForm'}}">
+                                                    <figure class="product-media">
+                                                        <a href="{{url('products/'.$product[$k]->id.'/'.$product[$k]->slug)}}">
+                                                            <img src="{{$product[$k]->photo}}" alt="Product"
+                                                                 width="330" height="338" />
+                                                        </a>
+                                                        <div class="product-action-vertical">
+                                                            <a href="#" class="btn-product-icon btn-wishlist w-icon-heart wishlistProduct"
+                                                               title="Add to wishlist" data-id="{{$product[$k]->id}}" id="{{'wish'.$product[$k]->id}}"></a>
+                                                            <a href="#" class="btn-product-icon btn-compare w-icon-compare compareProduct"
+                                                               title="Add to Compare" data-id="{{$product[$k]->id}}" id="{{'com'.$product[$k]->id}}"></a>
+                                                        </div>
+                                                        <div class="product-action">
+                                                            <a href="{{url('products/'.$product[$k]->id.'/'.$product[$k]->slug)}}" class="btn-product btn-quickview" title="Quick View">Quick
+                                                                View</a>
+                                                        </div>
+                                                    </figure>
+                                                    <div class="product-details">
+                                                        <h4 class="product-name">
+                                                            <a href="">{{$product[$k]->unit}}</a>
+                                                        </h4>
+                                                        <h3 class="product-name">
+                                                            <a href="{{url('products/'.$product[$k]->id.'/'.$product[$k]->slug)}}">{{$product[$k]->name}}</a>
+                                                        </h3>
+                                                        <div class="product-pa-wrapper" style="margin-bottom: 10px;">
+                                                            <input type="hidden" name="quantity" id="{{$product[$k]->id.'q'}}" value="{{$product[$k]->minqty}}">
+                                                            <div class="product-price">
+                                                                <ins class="new-price">{{$product[$k]->discount_price.' Taka'}}</ins><del class="old-price">{{$product[$k]->price.' Taka'}}</del>
+                                                            </div>
+                                                            @if($product[$k]->size == null)
+                                                            <div class="product-action">
+                                                                <button type="submit" data-id="{{$product[$k]->id}}" id="{{'bg'.$product[$k]->id}}" class="submit">Add To Cart</button>
+                                                            </div>
+                                                            @else
+                                                                <div class="product-action">
+                                                                    <a href="{{url('products/'.$product[$k]->id.'/'.$product[$k]->slug)}}" class="submit">View Options</a>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </form>
                                             </div>
-                                            <div class="product-action">
-                                                <button type="submit" data-id="{{$product->id}}" id="{{'bg'.$product->id}}" class="submit">Add To Cart</button>
-                                            </div>
-                                        </div>
+                                            <?php
+                                                $k++;
+                                            ?>
+                                        @endfor
                                     </div>
-                                </form>
+                                    <?php
+                                        $j=0;
+                                    ?>
+                                @endfor
                             </div>
                         </div>
-                    @endforeach
+                    </div>
                 </div>
-            </div>
-            <?php } ?>
+            <?php
+                $i=0;
+                }
+                ?>
         </div>
     </main>
 @endsection

@@ -1,5 +1,5 @@
 @extends('frontend.layout')
-@section('title', 'Pages || Under-Garments.Xyz Best Online Under Garments, Sex and Beauty Shop in Bangladesh')
+@section('title', 'Signup/Login || Under-Garments.Xyz Best Online Under Garments, Sex and Beauty Shop in Bangladesh')
 @section('myOrder', 'active')
 @section('css')
     <link rel="stylesheet" type="text/css" href="{{url('public/asset/woolmart/css/style.min.css')}}">

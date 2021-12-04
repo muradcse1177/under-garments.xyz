@@ -130,7 +130,7 @@
                                         stack: false
                                     })
                                     $('#donateTable').html(response.output_donate);
-                                    var g_total = response.donate_total['g_total']
+                                    var g_total = response.donate_total['g_total'];
                                     var g_total1 = g_total.split('.');
                                     var final1 = parseInt(g_total1[0]);
                                     var total = final1;

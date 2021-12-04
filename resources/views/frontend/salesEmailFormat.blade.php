@@ -27,7 +27,7 @@
     <tr>
         <td>{{$products->name}}</td>
         <td>{{$products->quantity. $products->unit}}</td>
-        <td>{{$products->price}}</td>
+        <td>{{$products->discount_price}}</td>
     </tr>
     @endforeach
 </table>

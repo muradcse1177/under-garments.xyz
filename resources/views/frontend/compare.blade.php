@@ -60,7 +60,7 @@
                                 <tr>
                                     <td class="product-thumbnail">
                                         <div class="p-relative">
-                                            <a href="{{url('product-by-id/'.$product->product_id)}}">
+                                            <a href="{{url('products/'.$product->product_id.'/'.$product->slug)}}">
                                                 <figure>
                                                     <img src="{{url($image)}}" alt="product"
                                                          width="300" height="338">
@@ -71,7 +71,7 @@
                                         </div>
                                     </td>
                                     <td class="product-name">
-                                        <a href="{{url('product-by-id/'.$product->product_id)}}">
+                                        <a href="{{url('products/'.$product->product_id.'/'.$product->slug)}}">
                                             {{$product->name}}
                                         </a>
                                     </td>

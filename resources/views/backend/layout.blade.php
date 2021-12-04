@@ -364,7 +364,7 @@
     </div>
     <!-- /.content-wrapper -->
     <footer class="main-footer">
-        <center><strong>&copy; বাজার-সদাই, ২০২০। সার্বিক সহযোগীতায়-  <a href="https://parallax-soft.com/" target="_blank">Parallax Soft Inc.</a></strong></center>
+        <center><strong>&copy; Under-Garments.xyz,{{Date('Y')}} । Developed By-  <a href="https://parallax-soft.com/" target="_blank">Parallax Soft Inc.</a></strong></center>
     </footer>
 </div>
 

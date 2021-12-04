@@ -69,6 +69,7 @@ Route::group(['middleware' => ['adminUser']], function () {
     Route::get('getPOSProductSearch', 'backend\ReportController@getPOSProductSearch');
     Route::get('getPOSProductAdd', 'backend\ReportController@getPOSProductAdd');
     Route::post('insertPOSSale', 'backend\ReportController@insertPOSSale');
+    Route::get('printInvoice', 'backend\ReportController@printInvoice');
 
 //Accounting
     Route::get('accountName', 'backend\ReportController@accountName');
@@ -183,7 +184,7 @@ Route::group(['middleware' => ['buyer']], function () {
     });
     Route::get('shop', 'frontend\FrontController@shop');
     Route::get('cart', 'frontend\FrontController@cart');
-    Route::get('product-by-id/{id}', 'frontend\FrontController@productById');
+    Route::get('products/{id}/{slug}', 'frontend\FrontController@productById');
     Route::get('shop-by-price/{id}', 'frontend\FrontController@shopByPrice');
     Route::post('productQuantityChange', 'frontend\FrontController@productQuantityChange');
     Route::post('clear_cart', 'frontend\FrontController@clear_cart');
@@ -201,6 +202,9 @@ Route::group(['middleware' => ['buyer']], function () {
     Route::get('pages/{id}', 'backend\UserController@getPages');
     Route::get('wishlist', 'frontend\FrontController@wishlist');
     Route::get('compare', 'frontend\FrontController@compare');
+    Route::get('product-increase/{id}', 'frontend\FrontController@nextproducts');
+    Route::get('product-decrease/{id}', 'frontend\FrontController@beforeproducts');
+    Route::get('getProductOnScroll', 'frontend\FrontController@getProductOnScroll');
 
     //Payment Gateway
     Route::post('getPaymentCartView', 'frontend\PaymentController@getPaymentCartView');

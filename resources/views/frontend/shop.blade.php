@@ -147,7 +147,7 @@
                             </div>
                         @endif
 
-                        <div class="product-wrapper row cols-md-4 cols-sm-2 cols-2">
+                        <div class="product-wrapper row cols-md-4 cols-sm-2 cols-2 productDiv">
                             @foreach($products as $product)
                                 @php
                                 $price = $product->price;
@@ -161,36 +161,34 @@
                                     <div class="product product-simple text-center">
                                         <form class="form-inline" id="{{$product->id.'productForm'}}">
                                             <figure class="product-media">
-                                                <a href="{{url('product-by-id/'.$product->id)}}">
-                                                    <img src="{{$Image}}" alt="Product"
-                                                         width="330" height="338" />
+                                                <a href="{{url('products/'.$product->id.'/'.$product->slug)}}">
+                                                    <img src="{{$Image}}" alt="Product" width="330" height="338" />
                                                 </a>
                                                 <div class="product-action-vertical">
-                                                    <a href="#" class="btn-product-icon btn-wishlist w-icon-heart wishlistProduct"
-                                                       title="Add to wishlist" data-id="{{$product->id}}" id="{{'wish'.$product->id}}"></a>
-                                                    <a href="#" class="btn-product-icon btn-compare w-icon-compare compareProduct"
-                                                       title="Add to Compare" data-id="{{$product->id}}" id="{{'com'.$product->id}}"></a>
+                                                    <a href="#" class="btn-product-icon btn-wishlist w-icon-heart wishlistProduct" title="Add to wishlist" data-id="{{$product->id}}" id="{{'wish'.$product->id}}"></a>
+                                                    <a href="#" class="btn-product-icon btn-compare w-icon-compare compareProduct" title="Add to Compare" data-id="{{$product->id}}" id="{{'com'.$product->id}}"></a>
                                                 </div>
                                                 <div class="product-action">
-                                                    <a href="{{url('product-by-id/'.$product->id)}}" class="btn-product btn-quickview" title="Quick View">Quick
-                                                        View</a>
+                                                    <a href="{{url('products/'.$product->id.'/'.$product->slug)}}" class="btn-product btn-quickview" title="Quick View">Quick View</a>
                                                 </div>
                                             </figure>
                                             <div class="product-details">
-                                                <h4 class="product-name">
-                                                    <a href="">{{$product->minqty.'  '.$product->unit}}</a>
-                                                </h4>
-                                                <h3 class="product-name">
-                                                    <a href="{{url('product-by-id/'.$product->id)}}">{{$product->name}}</a>
-                                                </h3>
+                                                <h4 class="product-name"><a href="">{{$product->minqty.'  '.$product->unit}}</a></h4>
+                                                <h3 class="product-name"><a href="{{url('products/'.$product->id.'/'.$product->slug)}}">{{$product->name}}</a></h3>
                                                 <div class="product-pa-wrapper">
                                                     <input type="hidden" name="quantity" id="{{$product->id.'q'}}" value="{{$product->minqty}}">
                                                     <div class="product-price">
                                                         <ins class="new-price">{{$product->discount_price.' Taka'}}</ins><del class="old-price">{{$price.' Taka'}}</del>
                                                     </div>
-                                                    <div class="product-action">
-                                                        <button type="submit" data-id="{{$product->id}}" id="{{'bg'.$product->id}}" class="submit">Add To Cart</button>
-                                                    </div>
+                                                    @if($product->size == null)
+                                                        <div class="product-action">
+                                                            <button type="submit" data-id="{{$product->id}}" id="{{'bg'.$product->id}}" class="submit">Add To Cart</button>
+                                                        </div>
+                                                    @else
+                                                        <div class="product-action">
+                                                            <a href="{{url('products/'.$product->id.'/'.$product->slug)}}"class="submit">View Options</a>
+                                                        </div>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </form>
@@ -198,8 +196,8 @@
                                 </div>
                             @endforeach
                         </div>
-                        <div class="d-flex justify-content-center">
-                            {!!  $products->links() !!}
+                        <div>
+                            <input type="hidden" name="loadCounter" id="loadCounter" value="0">
                         </div>
                     </div>
                     <!-- End of Shop Main Content -->
@@ -235,6 +233,51 @@
                 $("#trade_name").hide();
                 $("#generic_name").hide();
             });
+        });
+
+        $(window).scroll(function () {
+            if ($(window).height() + $(window).scrollTop() == $(document).height()) {
+                var loadCounter = parseInt($("#loadCounter").val());
+                var parts = window.location.href.split('/');
+                var baseUrl = '{{url('/')}}/';
+                 $.ajax({
+                    type: 'GET',
+                    url: '{{url('getProductOnScroll')}}',
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "id":loadCounter,
+                        "part4":parts[4],
+                        "part5":parts[5],
+                    },
+                    dataType: 'json',
+                    success: function(response){
+                        var html = '';
+                        var data = response.data;
+                        for(var i =0; i<data.length; i++){
+                            html += '<div class="product-wrap">';
+                            html += '<div class="product product-simple text-center">';
+                            html += '<form class="form-inline" id="'+data[i].id+'productForm">';
+                            html += '<figure class="product-media">';
+                            html += '<a href="'+baseUrl+'products/'+data[i].id+'/'+data[i].slug+'"> <img src="'+baseUrl+data[i].photo+'" alt="Product" width="330" height="338" /> </a>';
+                            html += '<div class="product-action-vertical">';
+                            html += '<a href="#" class="btn-product-icon btn-wishlist w-icon-heart wishlistProduct" title="Add to wishlist" data-id="'+data[i].id+'" id="wish'+data[i].id+'"></a>';
+                            html += '<a href="#" class="btn-product-icon btn-compare w-icon-compare compareProduct" title="Add to Compare" data-id="'+data[i].id+'" id="com'+data[i].id+'"></a> </div>';
+                            html += '<div class="product-action"> <a href="'+baseUrl+'products/'+data[i].id+'/'+data[i].slug+'" class="btn-product btn-quickview" title="Quick View">Quick View</a> </div> </figure>';
+                            html += '<div class="product-details">';
+                            html += '<h4 class="product-name"><a href="">'+data[i].minqty+'  '+data[i].unit+'</a></h4>';
+                            html += '<h3 class="product-name"><a href="'+baseUrl+'products/'+data[i].id+'/'+data[i].slug+'">'+data[i].name+'</a></h3>';
+                            html += '<div class="product-pa-wrapper">';
+                            html += '<input type="hidden" name="quantity" id="'+data[i].id+'q" value="'+data[i].minqty+'">';
+                            html += '<div class="product-price"> <ins class="new-price">'+data[i].discount_price+' Taka'+'</ins><del class="old-price">'+data[i].price+' Taka'+'</del> </div>';
+                            html += '<div class="product-action">';
+                            html += '<button type="submit" data-id="'+data[i].id+'" id="bg'+data[i].minqty+'" class="submit">Add To Cart</button> </div>';
+                            html += '<div class="product-action"> <a href="'+baseUrl+'products/'+data[i].id+'/'+data[i].slug+'"class="submit">View Options</a> </div> </div> </div> </form> </div> </div>';
+                        }
+                        $('.productDiv').append(html);
+                        $("#loadCounter").val(parseInt(parseInt(response.id)+1));
+                    }
+                });
+            }
         });
     </script>
 @endsection

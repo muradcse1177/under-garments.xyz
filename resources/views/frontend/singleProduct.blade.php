@@ -6,18 +6,17 @@
     <link rel='stylesheet' type="text/css" href="{{url('public/asset/woolmart/css/style.min.css')}}">
     <link rel="stylesheet" type="text/css" href="{{url('public/asset/woolmart/css/demo3.min.css')}}">
     <style>
-        .asdf {
-            background-color: #4CAF50; /* Green */
-            border: none;
-            color: white;
-            padding: 4px 8px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-        }
+         .asdf {
+             background-color: #00BAA3;
+             border: none;
+             color: white;
+             padding: 4px 8px;
+             text-align: center;
+             text-decoration: none;
+             display: inline-block;
+             font-size: 16px;
+             cursor: pointer;
+         }
     </style>
 @endsection
 @section('content')
@@ -30,12 +29,12 @@
             </ul>
             <ul class="product-nav list-style-none">
                 <li class="product-nav-prev">
-                    <a href="{{url('product-increase')}}">
+                    <a href="{{url('product-decrease/'.$products->id)}}">
                         <i class="w-icon-angle-left"></i>
                     </a>
                 </li>
                 <li class="product-nav-next">
-                    <a href="{{url('product-decrease')}}">
+                    <a href="{{url('product-increase/'.$products->id)}}">
                         <i class="w-icon-angle-right"></i>
                     </a>
                 </li>
@@ -108,6 +107,7 @@
                                         <div class="product-price">
                                             <ins class="new-price">{{$products->discount_price.' Taka'}}</ins><del class="old-price">{{$price.' Taka'}}</del>
                                         </div>
+
                                         <div class="ratings-container">
                                             <div class="ratings-full">
                                                 <span class="ratings" style="width: 80%;"></span>
@@ -128,7 +128,17 @@
                                         <div class="product-short-desc" style="text-align: justify;">
                                             {!! nl2br(substr($products->description, 0, 700)).'...' !!}
                                         </div>
-
+                                        @if($products->size != null)
+                                        <div class="form-group">
+                                            <input type="hidden" name="selectChecker" class="selectChecker" value="1">
+                                            <select class="form-control size" name="size" style="width: 100%;" required>
+                                                <option value="" selected> Select Your Size</option>
+                                                @foreach(json_decode($products->size) as $size)
+                                                <option value="{{$size}}" >{{$size}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        @endif
                                         <hr class="product-divider">
                                         <div class="fix-bottom">
                                             <div class="product-form container">
@@ -216,7 +226,7 @@
                                         <div class="product product-simple text-center">
                                             <form class="form-inline" id="{{$product->id.'productForm'}}">
                                                 <figure class="product-media">
-                                                    <a href="{{url('product-by-id/'.$product->id)}}">
+                                                    <a href="{{url('products/'.$product->id.'/'.$product->slug)}}">
                                                         <img src="{{$Image}}" alt="Product"
                                                              width="330" height="338" />
                                                     </a>
@@ -227,7 +237,7 @@
                                                            title="Add to Compare" data-id="{{$product->id}}" id="{{'com'.$product->id}}"></a>
                                                     </div>
                                                     <div class="product-action">
-                                                        <a href="{{url('product-by-id/'.$product->id)}}" class="btn-product btn-quickview" title="Quick View">Quick
+                                                        <a href="{{url('products/'.$product->id.'/'.$product->slug)}}" class="btn-product btn-quickview" title="Quick View">Quick
                                                             View</a>
                                                     </div>
                                                 </figure>
@@ -236,16 +246,22 @@
                                                         <a href="">{{$product->unit}}</a>
                                                     </h4>
                                                     <h3 class="product-name">
-                                                        <a href="{{url('product-by-id/'.$product->id)}}">{{$product->name}}</a>
+                                                        <a href="{{url('products/'.$product->id.'/'.$product->slug)}}">{{$product->name}}</a>
                                                     </h3>
                                                     <div class="product-pa-wrapper">
                                                         <input type="hidden" name="quantity" id="{{$product->id.'q'}}" value="{{$product->minqty}}">
                                                         <div class="product-price">
                                                             <ins class="new-price">{{$product->discount_price.' Taka'}}</ins><del class="old-price">{{$price.' Taka'}}</del>
                                                         </div>
-                                                        <div class="product-action">
-                                                            <button type="submit" data-id="{{$product->id}}" id="{{'bg'.$product->id}}" class="submit asdf">Add To Cart</button>
-                                                        </div>
+                                                        @if($product->size == null)
+                                                            <div class="product-action">
+                                                                <button type="submit" data-id="{{$product->id}}" id="{{'bg'.$product->id}}" class="submit asdf">Add To Cart</button>
+                                                            </div>
+                                                        @else
+                                                            <div class="product-action">
+                                                                <a href="{{url('products/'.$product->id.'/'.$product->slug)}}" class="submit asdf">View Options</a>
+                                                            </div>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </form>
@@ -332,14 +348,14 @@
                                                     @endphp
                                                     <div class="product product-widget">
                                                         <figure class="product-media">
-                                                            <a href="{{url('product-by-id/'.$rel_products_desc[$a]->id)}}">
+                                                            <a href="{{url('products/'.$rel_products_desc[$a]->id.'/'.$rel_products_desc[$a]->slug)}}">
                                                                 <img src="{{$Image}}" alt="Product"
                                                                      width="100" height="113" />
                                                             </a>
                                                         </figure>
                                                         <div class="product-details">
                                                             <h4 class="product-name">
-                                                                <a href="{{url('product-by-id/'.$rel_products_desc[$a]->id)}}">{{$rel_products_desc[$a]->name}}</a>
+                                                                <a href="{{url('products/'.$rel_products_desc[$a]->id.'/'.$rel_products_desc[$a]->slug)}}">{{$rel_products_desc[$a]->name}}</a>
                                                             </h4>
                                                             <div class="ratings-container">
                                                                 <div class="ratings-full">

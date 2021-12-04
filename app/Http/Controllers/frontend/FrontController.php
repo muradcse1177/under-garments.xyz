@@ -28,9 +28,6 @@ class FrontController extends Controller
                 ->orWhere('type','3')
                 ->where('status','1')
                 ->orderBy('id', 'ASC')->get();
-            $products= DB::table('products')
-                ->where('status', 1)
-                ->inRandomOrder()->take(15)->first();
             return view('frontend.n_index',
                 [
                     'pro_categories' => $product_cat,
@@ -52,7 +49,7 @@ class FrontController extends Controller
                 ->orderBy('id', 'ASC')->get();
             $dealer_product_1 = DB::table('products')
                 ->where('status', 1)
-                ->inRandomOrder()->paginate(60);
+                ->inRandomOrder()->get()->take(60);
 
             //dd($dealer_product_1);
             return view('frontend.shop',
@@ -98,6 +95,68 @@ class FrontController extends Controller
             return back()->with('errorMessage', $ex->getMessage());
         }
     }
+    public function nextproducts($id){
+        try{
+            $category = DB::table('products')
+                ->where('id',$id)
+                ->first();
+            $dealer_product_1 = DB::table('products')
+              ->where('id', '>', $id)->first();
+            $related_product = DB::table('products')
+                ->where('products.cat_id', $category->cat_id)
+                ->where('products.status', 1)
+                ->inRandomOrder()
+                ->take(10)
+                ->get();
+            $related_product_desc = DB::table('products')
+                ->where('products.cat_id', $category->cat_id)
+                ->where('products.status', 1)
+                ->inRandomOrder()
+                ->take(10)
+                ->get();
+            return view('frontend.singleProduct',
+                [
+                    'products' => $dealer_product_1 ,
+                    'rel_products' => $related_product ,
+                    'rel_products_desc' => $related_product_desc ,
+                    'cat_id' =>$category->cat_id,
+                ]);
+        }
+        catch(\Illuminate\Database\QueryException $ex){
+            return back()->with('errorMessage', $ex->getMessage());
+        }
+    }
+    public function beforeproducts($id){
+        try{
+            $category = DB::table('products')
+                ->where('id',$id)
+                ->first();
+            $dealer_product_1 = DB::table('products')
+              ->where('id', '<', $id)->first();
+            $related_product = DB::table('products')
+                ->where('products.cat_id', $category->cat_id)
+                ->where('products.status', 1)
+                ->inRandomOrder()
+                ->take(10)
+                ->get();
+            $related_product_desc = DB::table('products')
+                ->where('products.cat_id', $category->cat_id)
+                ->where('products.status', 1)
+                ->inRandomOrder()
+                ->take(10)
+                ->get();
+            return view('frontend.singleProduct',
+                [
+                    'products' => $dealer_product_1 ,
+                    'rel_products' => $related_product ,
+                    'rel_products_desc' => $related_product_desc ,
+                    'cat_id' =>$category->cat_id,
+                ]);
+        }
+        catch(\Illuminate\Database\QueryException $ex){
+            return back()->with('errorMessage', $ex->getMessage());
+        }
+    }
     public function getProductByCatId($id,  Request $request){
         try{
             $slide= DB::table('slide')
@@ -123,7 +182,7 @@ class FrontController extends Controller
             $dealer_product = DB::table('products')
                 ->where('cat_id', $id)
                 ->where('status', 1)
-                ->inRandomOrder()->paginate(100);
+                ->get()->take(100);
             return view('frontend.shop',
                 [
                     'products' => $dealer_product ,
@@ -535,17 +594,19 @@ class FrontController extends Controller
         try{
             $id = $request->id;
             $quantity = $request->quantity;
+            $size = $request->size;
             if(Cookie::get('user_id') != null){
                 $rowsCount = DB::table('carts')
                     ->where('user_id', Cookie::get('user_id'))
                     ->where('product_id', $id)
                     ->distinct()->get()->count();
-                if($rowsCount < 1){
+                if($rowsCount == 0){
                     try{
                         $result = DB::table('carts')->insert([
                             'user_id' => Cookie::get('user_id'),
                             'product_id' => $id,
-                            'quantity' =>$quantity
+                            'quantity' =>$quantity,
+                            'size' =>$size
                         ]);
                         if(@$request->fromWishlist == 1){
                             $result =DB::table('wishlist')
@@ -582,14 +643,17 @@ class FrontController extends Controller
                 if (in_array($id, $exist)) {
                     $output['error'] = true;
                     $output['message'] = 'Product already in cart';
-                } else {
+                }
+                else {
                     $data['productid'] = $id;
                     $data['quantity'] = $quantity;
+                    $data['size'] = $size;
                     $item = Session::get('cart_item');
                     if (array_push($item, $data)) {
                         Session::put('cart_item', $item);
                         $output['message'] = 'Item added to cart';
-                    } else {
+                    }
+                    else {
                         $output['error'] = true;
                         $output['message'] = 'Cannot add item to cart';
                     }
@@ -637,14 +701,14 @@ class FrontController extends Controller
                             $output['list'] .= '
                             <div class="product product-cart">
                                     <div class="product-detail">
-                                        <a href="'.url('product-by-id/'.$row->product_id) .'" class="product-name">'.$row->name.'<br></a>
+                                        <a href="'.url('products/'.$row->product_id.'/'.$row->slug) .'" class="product-name">'.$row->name.'<br></a>
                                         <div class="price-box">
                                             <span class="product-quantity">'.$bquantity.'</span>
                                             <span class="product-price">'.number_format($bprice,2).'</span>
                                         </div>
                                     </div>
                                     <figure class="product-media">
-                                        <a href="'.url('product-by-id/'.$row->product_id) .'">
+                                        <a href="'.url('products/'.$row->product_id.'/'.$row->slug) .'">
                                             <img src="'. $url . $image .'" alt="product" height="84"
                                                  width="94" />
                                         </a>
@@ -714,14 +778,14 @@ class FrontController extends Controller
                         $output['list'] .= '
                             <div class="product product-cart">
                                     <div class="product-detail">
-                                        <a href="'.url('product-by-id/'.$product->id) .'" class="product-name">'.$product->name.'<br></a>
+                                        <a href="'.url('products/'.$product->id.'/'.$product->slug) .'" class="product-name">'.$product->name.'<br></a>
                                         <div class="price-box">
                                             <span class="product-quantity">'.$bquantity.'</span>
                                             <span class="product-price">'.number_format($bprice,2).'/-'.'</span>
                                         </div>
                                     </div>
                                     <figure class="product-media">
-                                        <a href="'.url('product-by-id/'.$product->id) .'">
+                                        <a href="'.url('products/'.$product->id.'/'.$product->slug) .'">
                                             <img src="'. $url . $image .'" alt="product" height="84"
                                                  width="94" />
                                         </a>
@@ -857,7 +921,7 @@ class FrontController extends Controller
                                 <tr>
                                     <td class="product-thumbnail">
                                         <div class="p-relative">
-                                            <a href="'.url('product-by-id/'.$row->product_id).'">
+                                            <a href="'.url('products/'.$row->product_id.'/'.$row->slug).'">
                                                 <figure>
                                                     <img src="'.$image.'" alt="product"
                                                          width="300" height="338">
@@ -868,7 +932,7 @@ class FrontController extends Controller
                                         </div>
                                     </td>
                                     <td class="product-name">
-                                        <a href="'.url('product-by-id/'.$row->product_id).'">
+                                        <a href="'.url('products/'.$row->product_id.'/'.$row->slug).'">
                                             '.$row->name.'
                                         </a>
                                     </td>
@@ -904,7 +968,7 @@ class FrontController extends Controller
             }
             else {
                 if(Session::get('cart_item')){
-                    $count= count(Session::get('cart_item'));
+                    $count = count(Session::get('cart_item'));
                     if ($count > 0) {
                         $total = 0;
                         foreach (Session::get('cart_item') as $row) {
@@ -921,7 +985,7 @@ class FrontController extends Controller
                                 <tr>
                                     <td class="product-thumbnail">
                                         <div class="p-relative">
-                                            <a href="' . url('product-by-id/' . $product->id) . '">
+                                            <a href="' . url('products/'.$product->id.'/'.$product->slug) . '">
                                                 <figure>
                                                     <img src="' . $image . '" alt="product"
                                                          width="300" height="338">
@@ -932,7 +996,7 @@ class FrontController extends Controller
                                         </div>
                                     </td>
                                     <td class="product-name">
-                                        <a href="' . url('product-by-id/' . $product->id) . '">
+                                        <a href="' . url('products/'.$product->id.'/'.$product->slug) . '">
                                             ' . $product->name . '
                                         </a>
                                     </td>
@@ -1118,7 +1182,7 @@ class FrontController extends Controller
                 ]);
                 $salesid = DB::getPdo()->lastInsertId();
                 $stmt = DB::table('carts')
-                    ->select('*','carts.id AS cartid')
+                    ->select('*','carts.id AS cartid','carts.size as c_size')
                     ->leftJoin('products', 'products.id', '=', 'carts.product_id')
                     ->where('carts.user_id',Cookie::get('user_id'))
                     ->orderBy('products.id','Asc')
@@ -1129,7 +1193,8 @@ class FrontController extends Controller
                         'sales_id' => $salesid,
                         'product_id' => $row->product_id,
                         'quantity' => $row->quantity,
-                        'price' => $row->discount_price
+                        'price' => $row->discount_price,
+                        'size' => $row->c_size
                     ]);
                     $total = $total + (int)$row->discount_price;
                 }
@@ -1144,8 +1209,8 @@ class FrontController extends Controller
                     'data' => $stmt,
                     'tx_id' => $tx_id,
                 );
-//                $salesEmail = 'sales@under-garments.xyz';
-//                $emails = [$email];
+                $salesEmail = 'sales@under-garments.xyz';
+                $emails = [$email];
 //                Mail::send('frontend.salesEmailFormat',$data, function($message) use($emails,$salesEmail,$name,$phone) {
 //                    $message->to($emails)->subject('Order List From Under-garments.xyz by '.$name.' ('.$phone. ' )');
 //                    $message->from(''.$salesEmail.'','Under-garments.xyz');
@@ -1206,7 +1271,8 @@ class FrontController extends Controller
                         'sales_id' => $salesid,
                         'product_id' => $product->id,
                         'quantity' => $quantity,
-                        'price' => $product->discount_price
+                        'price' => $product->discount_price,
+                        'size' =>$row['size']
                     ]);
                 }
                 $rows = DB::table('delivery_charges')
@@ -1247,6 +1313,11 @@ class FrontController extends Controller
                     'address' =>$address,
                 ]);
                 if($result){
+//                    $data = array(
+//                        'userName'=> $name,
+//                        'data' => $stmt,
+//                        'tx_id' => $tx_id,
+//                    );
 //                    $salesEmail = 'sales@under-garments.xyz';
 //                    $emails = [$email];
 //                    Mail::send('frontend.salesEmailFormat',$data, function($message) use($emails,$salesEmail,$name,$phone) {
@@ -1616,6 +1687,38 @@ class FrontController extends Controller
                     $data=2;
                 }
                 return response()->json(array('data'=>$data));
+            }
+            catch(\Illuminate\Database\QueryException $ex){
+                return back()->with('errorMessage', $ex->getMessage());
+            }
+        }
+        catch(\Illuminate\Database\QueryException $ex){
+            return back()->with('errorMessage', $ex->getMessage());
+        }
+    }
+    public function getProductOnScroll(Request $request){
+        try{
+            try{
+                $id = $request->id;
+                $in_id = $id*10;
+                if($request->part4 == 'shop'){
+                    $results = DB::table('products')->skip($in_id)->take(10)->get();
+                }
+                if($request->part4 == 'shop-by-cat'){
+                    $results = DB::table('products')->where('cat_id', $request->part5)->skip($in_id)->take(10)->get();
+                }
+                if($request->part4 == 'shop-by-subCat'){
+                    $sub_cat = DB::table('subcategories')
+                        ->where('id', $request->part5)
+                        ->where('status', 1)
+                        ->orderBy('id', 'Desc')->first();
+                    $results = DB::table('products')
+                        ->where('cat_id', $sub_cat->cat_id)
+                        ->where('sub_cat_id', $request->part5)
+                        ->where('status', 1)
+                        ->skip($in_id)->take(10)->get();
+                }
+                return response()->json(array('data'=>$results,'id' =>$id));
             }
             catch(\Illuminate\Database\QueryException $ex){
                 return back()->with('errorMessage', $ex->getMessage());

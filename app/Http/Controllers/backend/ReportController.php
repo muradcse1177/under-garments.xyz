@@ -583,4 +583,30 @@ class ReportController extends Controller
             return response()->json(array('data'=>$ex->getMessage()));
         }
     }
+    public function  printInvoice (Request $request){
+        $id = $request->salesId;
+        $order_details = DB::table('order_details')
+            ->where('tx_id',$id)
+            ->first();
+        $stmt= DB::table('v_assign')
+            ->where('v_assign.pay_id', $id)
+            ->first();
+        if($order_details->user_id == 0){
+            $stmt2= DB::table('details')
+                ->join('products', 'products.id', '=', 'details.product_id')
+                ->join('v_assign', 'v_assign.id', '=', 'details.sales_id')
+                ->where('details.sales_id', $stmt->id)
+                ->orderBy('products.id','Asc')
+                ->get();
+        }
+        else{
+            $stmt2= DB::table('details')
+                ->join('products', 'products.id', '=', 'details.product_id')
+                ->join('v_assign', 'v_assign.id', '=', 'details.sales_id')
+                ->where('details.sales_id', $stmt->id)
+                ->orderBy('products.id','Asc')
+                ->get();
+        }
+        return view('backend.invoice__print',['order_details'=>$order_details,'products'=>$stmt2]);
+    }
 }

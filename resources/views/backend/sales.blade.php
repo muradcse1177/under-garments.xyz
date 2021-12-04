@@ -70,7 +70,7 @@
                             <th>Tax</th>
                             <th>Order Notes</th>
                             <th>Status</th>
-                            <th>Details</th>
+                            <th colspan="2" style="text-align: center;">Action</th>
                         </tr>
                         @foreach($orders as $order)
                           <tr>
@@ -100,6 +100,7 @@
                                 </div>
                             </td>
                             <td><button type='button' class='btn btn-info btn-sm btn-flat transact' data-id='{{$order['sales_id']}}'><i class='fa fa-search'></i> Details</button></td>
+                            <td><a href="{{url('printInvoice?salesId='.$order['sales_id'])}}"><button type='button' class='btn btn-success btn-sm btn-flat print' data-id='{{$order['sales_id']}}'><i class='fa fa-print'></i> Print</button></a></td>
                           </tr>
                         @endforeach
                         <tr>
@@ -210,7 +211,6 @@
                 e.preventDefault();
                 $('#transaction').modal('show');
                 var id = $(this).data('id');
-                console.log(id);
                 $.ajax({
                     type: 'POST',
                     url: 'transaction',
