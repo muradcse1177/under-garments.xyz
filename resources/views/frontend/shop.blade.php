@@ -233,51 +233,55 @@
                 $("#trade_name").hide();
                 $("#generic_name").hide();
             });
+            $(window).on('scroll',infiniteScroll);
+            $(window).on('touchmove',infiniteScroll);
         });
 
-        $(window).scroll(function () {
-            if ($(window).height() + $(window).scrollTop() == $(document).height()) {
+        function infiniteScroll() {
+            if ($(window).scrollTop() >  $(document).height() - $(window).height() - 100) { {
                 var loadCounter = parseInt($("#loadCounter").val());
                 var parts = window.location.href.split('/');
                 var baseUrl = '{{url('/')}}/';
-                 $.ajax({
+                if (parts[3] == 'shop')
+                    var part4 = 0;
+                $.ajax({
                     type: 'GET',
                     url: '{{url('getProductOnScroll')}}',
                     data: {
                         "_token": "{{ csrf_token() }}",
-                        "id":loadCounter,
-                        "part3":parts[3],
-                        "part4":parts[4],
+                        "id": loadCounter,
+                        "part3": parts[3],
+                        "part4": part4,
                     },
                     dataType: 'json',
-                    success: function(response){
+                    success: function (response) {
                         var html = '';
                         var data = response.data;
-                        for(var i =0; i<data.length; i++){
+                        for (var i = 0; i < data.length; i++) {
                             html += '<div class="product-wrap">';
                             html += '<div class="product product-simple text-center">';
-                            html += '<form class="form-inline" id="'+data[i].id+'productForm">';
+                            html += '<form class="form-inline" id="' + data[i].id + 'productForm">';
                             html += '<figure class="product-media">';
-                            html += '<a href="'+baseUrl+'products/'+data[i].id+'/'+data[i].slug+'"> <img src="'+baseUrl+data[i].photo+'" alt="Product" width="330" height="338" /> </a>';
+                            html += '<a href="' + baseUrl + 'products/' + data[i].id + '/' + data[i].slug + '"> <img src="' + baseUrl + data[i].photo + '" alt="Product" width="330" height="338" /> </a>';
                             html += '<div class="product-action-vertical">';
-                            html += '<a href="#" class="btn-product-icon btn-wishlist w-icon-heart wishlistProduct" title="Add to wishlist" data-id="'+data[i].id+'" id="wish'+data[i].id+'"></a>';
-                            html += '<a href="#" class="btn-product-icon btn-compare w-icon-compare compareProduct" title="Add to Compare" data-id="'+data[i].id+'" id="com'+data[i].id+'"></a> </div>';
-                            html += '<div class="product-action"> <a href="'+baseUrl+'products/'+data[i].id+'/'+data[i].slug+'" class="btn-product btn-quickview" title="Quick View">Quick View</a> </div> </figure>';
+                            html += '<a href="#" class="btn-product-icon btn-wishlist w-icon-heart wishlistProduct" title="Add to wishlist" data-id="' + data[i].id + '" id="wish' + data[i].id + '"></a>';
+                            html += '<a href="#" class="btn-product-icon btn-compare w-icon-compare compareProduct" title="Add to Compare" data-id="' + data[i].id + '" id="com' + data[i].id + '"></a> </div>';
+                            html += '<div class="product-action"> <a href="' + baseUrl + 'products/' + data[i].id + '/' + data[i].slug + '" class="btn-product btn-quickview" title="Quick View">Quick View</a> </div> </figure>';
                             html += '<div class="product-details">';
-                            html += '<h4 class="product-name"><a href="">'+data[i].minqty+'  '+data[i].unit+'</a></h4>';
-                            html += '<h3 class="product-name"><a href="'+baseUrl+'products/'+data[i].id+'/'+data[i].slug+'">'+data[i].name+'</a></h3>';
+                            html += '<h4 class="product-name"><a href="">' + data[i].minqty + '  ' + data[i].unit + '</a></h4>';
+                            html += '<h3 class="product-name"><a href="' + baseUrl + 'products/' + data[i].id + '/' + data[i].slug + '">' + data[i].name + '</a></h3>';
                             html += '<div class="product-pa-wrapper">';
-                            html += '<input type="hidden" name="quantity" id="'+data[i].id+'q" value="'+data[i].minqty+'">';
-                            html += '<div class="product-price"> <ins class="new-price">'+data[i].discount_price+' Taka'+'</ins><del class="old-price">'+data[i].price+' Taka'+'</del> </div>';
+                            html += '<input type="hidden" name="quantity" id="' + data[i].id + 'q" value="' + data[i].minqty + '">';
+                            html += '<div class="product-price"> <ins class="new-price">' + data[i].discount_price + ' Taka' + '</ins><del class="old-price">' + data[i].price + ' Taka' + '</del> </div>';
                             html += '<div class="product-action">';
-                            html += '<button type="submit" data-id="'+data[i].id+'" id="bg'+data[i].minqty+'" class="submit">Add To Cart</button> </div>';
-                            html += '<div class="product-action"> <a href="'+baseUrl+'products/'+data[i].id+'/'+data[i].slug+'"class="submit">View Options</a> </div> </div> </div> </form> </div> </div>';
+                            html += '<button type="submit" data-id="' + data[i].id + '" id="bg' + data[i].minqty + '" class="submit">Add To Cart</button> </div>';
+                            html += '<div class="product-action"> <a href="' + baseUrl + 'products/' + data[i].id + '/' + data[i].slug + '"class="submit">View Options</a> </div> </div> </div> </form> </div> </div>';
                         }
                         $('.productDiv').append(html);
-                        $("#loadCounter").val(parseInt(parseInt(response.id)+1));
+                        $("#loadCounter").val(parseInt(parseInt(response.id) + 1));
                     }
                 });
             }
-        });
+        }
     </script>
 @endsection

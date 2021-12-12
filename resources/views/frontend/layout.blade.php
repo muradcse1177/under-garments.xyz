@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title')</title>
     {!! SEOMeta::generate() !!}
+    <title>@yield('title')</title>
     {!! OpenGraph::generate() !!}
     {!! Twitter::generate() !!}
     {!! JsonLd::generate() !!}
+    <title>@yield('title')</title>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{url('public/logo.ico')}}">
     <!-- WebFont.js -->
@@ -164,9 +165,9 @@
     $categories = DB::table('categories')->where('type','1')->where('status','1')->orWhere('type','3')->where('status','1')->take(12)->get();
 ?>
 <body class="home">
-<div id="loading">
-    <img id="loading-image" src="{{url('public/loading.gif')}}" alt="Loading..." />
-</div>
+{{--<div id="loading">--}}
+{{--    <img id="loading-image" src="{{url('public/loading.gif')}}" alt="Loading..." />--}}
+{{--</div>--}}
 
 <div class="page-wrapper">
     <!-- Start of Header -->

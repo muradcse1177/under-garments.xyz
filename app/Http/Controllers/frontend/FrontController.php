@@ -5,6 +5,7 @@ namespace App\Http\Controllers\frontend;
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\courier;
 use App\User;
+use Artesaos\SEOTools\Facades\OpenGraph;
 use Artesaos\SEOTools\Facades\SEOMeta;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -12,13 +13,17 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
+use Intervention\Image\ImageManagerStatic as Image;
 use smasif\ShurjopayLaravelPackage\ShurjopayService;
+use Jorenvh\Share\ShareFacade;
 
 class FrontController extends Controller
 {
     public function homepageManager(Request $request){
         try{
+
             $slide= DB::table('slide')
                 ->orderBy('id', 'DESC')
                 ->take(10)->get();
@@ -68,27 +73,37 @@ class FrontController extends Controller
             $category = DB::table('products')
                 ->where('id',$id)
                 ->first();
-                $dealer_product_1 = DB::table('products')
-                    ->where('products.id', $id)->first();
-                $related_product = DB::table('products')
-                    ->where('products.cat_id', $category->cat_id)
-                    ->where('products.status', 1)
-                    ->inRandomOrder()
-                    ->take(10)
-                    ->get();
-                $related_product_desc = DB::table('products')
-                    ->where('products.cat_id', $category->cat_id)
-                    ->where('products.status', 1)
-                    ->inRandomOrder()
-                    ->take(10)
-                    ->get();
-
+            $dealer_product_1 = DB::table('products')
+                ->where('products.id', $id)->first();
+            $related_product = DB::table('products')
+                ->where('products.cat_id', $category->cat_id)
+                ->where('products.status', 1)
+                ->inRandomOrder()
+                ->take(10)
+                ->get();
+            $related_product_desc = DB::table('products')
+                ->where('products.cat_id', $category->cat_id)
+                ->where('products.status', 1)
+                ->inRandomOrder()
+                ->take(10)
+                ->get();
+            $photo = explode(',',json_decode($dealer_product_1->slider));
+            SEOMeta::setTitle($dealer_product_1->name.' || Under-Garments.Xyz Best Online Under Garments, Sex and Beauty Shop in Bangladesh');
+            $img_url = url($dealer_product_1->share_photo);
+            $url = url('/').'/products/'.$dealer_product_1->id.'/'.$dealer_product_1->slug;
+            OpenGraph::addImage($img_url,['height' => 1200, 'width' => 630]);
+            OpenGraph::addImage(['url' => $img_url]);
+            $socialShare = \Share::page(
+                ''.$url.'',
+                ''.$dealer_product_1->name.''
+                )->facebook();
             return view('frontend.singleProduct',
                 [
                     'products' => $dealer_product_1 ,
                     'rel_products' => $related_product ,
                     'rel_products_desc' => $related_product_desc ,
                     'cat_id' =>$category->cat_id,
+                    'socialShare' =>$socialShare,
                 ]);
         }
         catch(\Illuminate\Database\QueryException $ex){

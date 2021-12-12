@@ -176,7 +176,6 @@ return [
         smasif\ShurjopayLaravelPackage\ShurjopayServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
         Artesaos\SEOTools\Providers\SEOToolsServiceProvider::class,
-
     ],
 
     /*
@@ -230,6 +229,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Image' => Intervention\Image\Facades\Image::class,
         'SEO' => Artesaos\SEOTools\Facades\SEOTools::class,
+        'Share' => Jorenvh\Share\ShareFacade::class,
     ],
 
 ];

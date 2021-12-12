@@ -1,5 +1,4 @@
 @extends('frontend.layout')
-@section('title', 'Single Product || Under-Garments.Xyz Best Online Under Garments, Sex and Beauty Shop in Bangladesh')
 @section('shop', 'active')
 @section('css')
     <link rel='stylesheet' type="text/css" href="{{url('public/asset/woolmart/css/style.min.css')}}">
@@ -17,7 +16,19 @@
              font-size: 16px;
              cursor: pointer;
          }
+
+         li span{
+             font-size: 20px;
+         }
+         ul li span{
+             display: inline-block;
+             padding: 10px 10px 5px;
+         }
+         #social-links{
+             float: left;
+         }
     </style>
+
 @endsection
 @section('content')
     <main class="main mb-10 pb-1">
@@ -155,15 +166,18 @@
                                             </div>
                                         </div>
                                         <div class="social-links-wrapper">
+
                                             <div class="social-links">
                                                 <div class="social-icons social-no-color border-thin">
-                                                    <a href="#" class="social-icon social-facebook w-icon-facebook"></a>
-                                                    <a href="#" class="social-icon social-twitter w-icon-twitter"></a>
-                                                    <a href="#"
-                                                       class="social-icon social-pinterest fab fa-pinterest-p"></a>
-                                                    <a href="#" class="social-icon social-whatsapp fab fa-whatsapp"></a>
-                                                    <a href="#"
-                                                       class="social-icon social-youtube fab fa-linkedin-in"></a>
+{{--                                                    <a href="#" class="social-icon social-facebook w-icon-facebook"></a>--}}
+{{--                                                    <a href="#" class="social-icon social-twitter w-icon-twitter"></a>--}}
+{{--                                                    <a href="#"--}}
+{{--                                                       class="social-icon social-pinterest fab fa-pinterest-p"></a>--}}
+{{--                                                    <a href="#" class="social-icon social-whatsapp fab fa-whatsapp"></a>--}}
+{{--                                                    <a href="#"--}}
+{{--                                                       class="social-icon social-youtube fab fa-linkedin-in"></a>--}}
+                                                    {!! $socialShare !!}
+
                                                 </div>
                                             </div>
                                             <span class="divider d-xs-show"></span>
